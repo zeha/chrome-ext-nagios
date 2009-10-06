@@ -1,0 +1,12 @@
+{
+	"name": "Nagios Status Toolstrip",
+	"version": "0.1",
+	"description": "Nagios Status viewer as a Toolstrip (very alpha)",
+	"background_page": "background.html",
+	"toolstrips": [
+		"my_toolstrip.html"
+	],
+	"permissions": [
+		"http://NAGIOS_HOST/*"
+	]
+}

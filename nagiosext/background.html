@@ -1,0 +1,91 @@
+<html>
+<head>
+<script src="prototype.js"></script>	
+<script>
+
+	var remoteUrl = "http://NAGIOS_HOST/cgi-bin/nagios2/tac.cgi";
+	var pollInterval = 30 * 1000; // 30 sec
+
+	function init() {
+		window.setTimeout(refreshStatus, 0);
+	}
+	function scheduleUpdate() {
+		window.setTimeout(refreshStatus, pollInterval);
+	}
+
+	function refreshStatus() {
+		var xhr = new XMLHttpRequest();
+		xhr.onreadystatechange = function() {
+			if (xhr.readyState == 4) {
+				if (xhr.responseText) {
+					parseAndUpdateStatusFromHtml(xhr.responseText);
+					scheduleUpdate();
+				}
+			}
+		};
+		xhr.open("GET", remoteUrl, true);
+		xhr.send(null);
+	}
+	function parseAndUpdateStatusFromHtml(htmltext) {
+		/* parse Host part */
+		var hostText = htmltext.substring(htmltext.indexOf('hostTitle'));
+		hostText = hostText.substring(hostText.indexOf('<tr>'));
+		hostText = hostText.substring(0, hostText.indexOf('</tr>'));
+		var hostString = "";
+		var hostData = new Hash();
+		while(hostText.indexOf('hostHeader') != -1) {
+			hostText = hostText.substring(hostText.indexOf('hostHeader'));
+			hostText = hostText.substring(hostText.indexOf('>')+1);
+			var thispart = hostText.substring(0, hostText.indexOf('<'));
+			if (thispart == "") continue;
+			var k = thispart.substring(thispart.indexOf(' ')).strip();
+			var v = thispart.substring(0, thispart.indexOf(' ')).strip();
+			hostData.set(k, parseInt(v));
+			hostString = hostString + ", " + thispart;
+		}
+		hostString = hostString.substring(2);
+		console.log(hostData);
+
+		/* parse Service part */
+		var serviceText = htmltext.substring(htmltext.indexOf('serviceTitle'));
+		serviceText = serviceText.substring(serviceText.indexOf('<tr>'));
+		serviceText = serviceText.substring(0, serviceText.indexOf('</tr>'));
+		var serviceString = "";
+		var serviceData = new Hash();
+		while(serviceText.indexOf('serviceHeader') != -1) {
+			serviceText = serviceText.substring(serviceText.indexOf('serviceHeader'));
+			serviceText = serviceText.substring(serviceText.indexOf('>')+1);
+			var thispart = serviceText.substring(0, serviceText.indexOf('<'));
+			if (thispart == "") continue;
+			var k = thispart.substring(thispart.indexOf(' ')).strip();
+			var v = thispart.substring(0, thispart.indexOf(' ')).strip();
+			serviceData.set(k, parseInt(v));
+			serviceString = serviceString + ", " + thispart;
+		}
+		serviceString = serviceString.substring(2);
+		console.log(serviceData);
+
+		/* calc color */
+		var color = "green";
+		if (hostData.get("Down") > 0 || hostData.get("Unreachable") > 0) {
+			color = "red";
+		}
+		if (serviceData.get("Critical") > 0) color = "red";
+		if (color == "green" && serviceData.get("Warning") > 0) color = "yellow";
+
+		var status = "Hosts: " + hostString + "<br>Services: " + serviceString;
+		updateUI(status, color);
+	}
+
+	function updateUI(status, color) {
+		var views = chrome.extension.getViews();
+		for (var i in views) {
+			if (views[i].updateStatus)
+			views[i].updateStatus(status, color);
+		}
+	}
+</script>
+</head>
+<body onload="init()">
+</body>
+</html>
