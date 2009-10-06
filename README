@@ -1,0 +1,13 @@
+This is a Google Chrome extension.
+
+As far as I understand it, you need to have Chrome 4.x to use this.
+
+Also for installation, you need to replace all NAGIOS_HOST occurences 
+with your Nagios v2 hostname.
+
+Then go to chrome://extensions/ and click "Load unpacked extension".
+
+
+Good luck!
+Christian
+
