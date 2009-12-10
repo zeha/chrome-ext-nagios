@@ -3,7 +3,7 @@
 <script src="prototype.js"></script>	
 <script>
 
-	var remoteUrl = "http://NAGIOS_HOST/cgi-bin/nagios2/tac.cgi";
+	var remoteUrl;
 	var pollInterval = 30 * 1000; // 30 sec
 
 	var hostData;
@@ -20,6 +20,11 @@
 	}
 
 	function refreshStatus() {
+		remoteUrl = localStorage["remoteurl"];
+		if (!remoteUrl) {
+			scheduleUpdate();
+			return;
+		}
 		var xhr = new XMLHttpRequest();
 		xhr.onreadystatechange = function() {
 			if (xhr.readyState == 4) {

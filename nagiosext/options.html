@@ -1,0 +1,38 @@
+<html>
+<head><title>Nagios Status Options</title></head>
+<script type="text/javascript">
+
+// Saves options to localStorage.
+function save_options() {
+  var remoteurl = document.getElementById("remoteurl");
+  localStorage["remoteurl"] = remoteurl.value;
+
+  // Update status to let user know options were saved.
+  var status = document.getElementById("status");
+  status.innerHTML = "Options Saved.";
+  setTimeout(function() {
+    status.innerHTML = "";
+  }, 750);
+}
+
+// Restores remoteurl box state to saved value from localStorage.
+function restore_options() {
+  var saved_remoteurl = localStorage["remoteurl"];
+  if (!saved_remoteurl) {
+    saved_remoteurl = "http://NAGIOS_HOST/cgi-bin/nagios2/tac.cgi";
+  }
+  var remoteurl = document.getElementById("remoteurl");
+  remoteurl.value = saved_remoteurl;
+}
+
+</script>
+
+<body onload="restore_options()">
+
+<label for="remoteurl">Nagios 2 TAC URL:</label> <input type="text" id="remoteurl" size=100 /> <br/>
+(Usually takes this form: http://NAGIOS_HOST/cgi-bin/nagios2/tac.cgi )<br/>
+
+<br>
+<button onclick="save_options()">Save</button> <div id="status" />
+</body>
+</html>
