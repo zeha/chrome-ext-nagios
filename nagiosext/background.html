@@ -6,6 +6,12 @@
 	var remoteUrl = "http://NAGIOS_HOST/cgi-bin/nagios2/tac.cgi";
 	var pollInterval = 30 * 1000; // 30 sec
 
+	var hostData;
+	var serviceData;
+
+	var currentStatus = "Loading...";
+	var currentColor = "#777";
+
 	function init() {
 		window.setTimeout(refreshStatus, 0);
 	}
@@ -32,7 +38,7 @@
 		hostText = hostText.substring(hostText.indexOf('<tr>'));
 		hostText = hostText.substring(0, hostText.indexOf('</tr>'));
 		var hostString = "";
-		var hostData = new Hash();
+		hostData = new Hash();
 		while(hostText.indexOf('hostHeader') != -1) {
 			hostText = hostText.substring(hostText.indexOf('hostHeader'));
 			hostText = hostText.substring(hostText.indexOf('>')+1);
@@ -51,7 +57,7 @@
 		serviceText = serviceText.substring(serviceText.indexOf('<tr>'));
 		serviceText = serviceText.substring(0, serviceText.indexOf('</tr>'));
 		var serviceString = "";
-		var serviceData = new Hash();
+		serviceData = new Hash();
 		while(serviceText.indexOf('serviceHeader') != -1) {
 			serviceText = serviceText.substring(serviceText.indexOf('serviceHeader'));
 			serviceText = serviceText.substring(serviceText.indexOf('>')+1);
@@ -74,15 +80,30 @@
 		if (color == "green" && serviceData.get("Warning") > 0) color = "yellow";
 
 		var status = "Hosts: " + hostString + "<br>Services: " + serviceString;
-		updateUI(status, color);
+		currentStatus = status;
+		currentColor = color;
+		updateColor();
 	}
 
-	function updateUI(status, color) {
-		var views = chrome.extension.getViews();
-		for (var i in views) {
-			if (views[i].updateStatus)
-			views[i].updateStatus(status, color);
-		}
+	function updateColor() {
+		var canvas = document.createElement('canvas');
+		canvas.width = 19;
+		canvas.height = 19;
+		var ctx = canvas.getContext("2d");
+		ctx.fillStyle = currentColor;
+		ctx.fillRect(0,0,19,19);
+		console.log("yay");
+		chrome.browserAction.setIcon({ imageData: ctx.getImageData(0, 0, 19, 19) });
+	}
+
+	function getCurrentStatus() {
+		return currentStatus;
+	}
+	function getRemoteUrl() {
+		return remoteUrl;
+	}
+	function getCurrentColor() {
+		return currentColor;
 	}
 </script>
 </head>

@@ -1,0 +1,58 @@
+<style>
+body {
+  overflow: hidden;
+  margin: 0px;
+  padding: 0px;
+  background: white;
+}
+div {
+  width: 400px;
+  color: black;
+  font-size: 70%;
+  cursor: hand;
+}
+</style>
+
+<script>
+	var backgroundView;
+	var pollInterval = 5 * 1000; // 5 sec
+	var remoteUrl = "";
+
+	function init() {
+		refreshThisView();
+	}
+	function scheduleUpdate() {
+		window.setTimeout(refreshThisView, pollInterval);
+	}
+
+	function refreshThisView() {
+		console.log("oh hi");
+		findBackgroundView();
+		updateData();
+		scheduleUpdate();
+	}
+
+	function findBackgroundView() {
+		var views = chrome.extension.getViews();
+		for (var i in views) {
+			if (views[i].getCurrentStatus) {
+				backgroundView = views[i];
+				break;
+			}
+		}
+	}
+
+	function updateData() {
+		remoteUrl = backgroundView.getRemoteUrl();
+		document.getElementById('statustext').innerHTML = backgroundView.getCurrentStatus();
+	}
+
+	function gotoNagios() {
+		window.open(remoteUrl);
+	}
+
+</script>
+
+<body onload="init()">
+<div id="statustext" onClick="gotoNagios();"><span style="color: #777;">Loading...</span></div>
+</body>

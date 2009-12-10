@@ -1,12 +1,13 @@
 {
-	"name": "Nagios Status Toolstrip",
+	"name": "Nagios Status",
 	"version": "0.1",
-	"description": "Nagios Status viewer as a Toolstrip (very alpha)",
+	"description": "Nagios Status viewer as a browser button (very alpha)",
 	"background_page": "background.html",
-	"toolstrips": [
-		"my_toolstrip.html"
-	],
+	"browser_action": {
+		"default_title": "Nagios Status",
+		"popup": "popup.html"
+	},
 	"permissions": [
-		"http://NAGIOS_HOST/*"
+		"http://*/*"
 	]
 }
